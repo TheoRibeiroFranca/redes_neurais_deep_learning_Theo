@@ -1,0 +1,37 @@
+# =============================================================================
+#  Bibliotecas das entregas — instaladas só no ambiente local (env/).
+#
+#      python3 -m pip install -r requirements-ml.txt --upgrade
+#
+#  Este arquivo já inclui o requirements.txt (site), então um único comando
+#  monta o ambiente inteiro: mkdocs para publicar + libs para as entregas.
+#
+#  O CI instala apenas o requirements.txt: o site é construído com
+#  `execute: false`, ou seja, o GitHub Actions nunca roda o código das
+#  entregas — ele só publica as saídas que você commitou.
+#
+#  Quem usa o quê, segundo os enunciados de 2026.2:
+#    Data, Perceptron, MLP → numpy, pandas, matplotlib/seaborn
+#                            (scikit-learn só para datasets, split, PCA e
+#                             matriz de confusão — o modelo é escrito por você)
+#    EDA (projeto)         → + umap-learn (o t-SNE vem do scikit-learn)
+#    VAE, Generativo       → + torch, torchvision
+# =============================================================================
+-r requirements.txt
+
+seaborn
+scipy
+umap-learn
+
+# --- PyTorch (CPU) --------------------------------------------------------
+# Esta máquina não tem GPU NVIDIA, e as wheels padrão do PyPI para Linux vêm
+# com ~2,5 GB de CUDA junto. As wheels "+cpu" do índice oficial fazem o mesmo
+# trabalho em ~200 MB. Ao migrar para uma máquina com GPU, apague as três
+# linhas abaixo e instale `torch torchvision` normalmente.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.0+cpu
+torchvision==0.29.0+cpu
+
+# --- apoio nos notebooks --------------------------------------------------
+tqdm
+ipywidgets
