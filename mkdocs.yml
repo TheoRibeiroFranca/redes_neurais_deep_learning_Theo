@@ -1,42 +1,33 @@
-site_name: Template de Entrega
-site_author: Sandmann, H.
-site_url: https://hsandmann.github.io/documentation.template
-repo_url: https://github.com/hsandmann/documentation.template
-repo_name: github/documentation.template
+# =============================================================================
+#  Entregas — Redes Neurais Artificiais & Deep Learning
+#  Enunciados da disciplina: https://insper.github.io/ann-dl/
+#  Como este site é publicado: docs/template/index.md > Publicação no GitHub Pages.
+# =============================================================================
+site_name: ANN-DL · Entregas — Theo Ribeiro França
+site_author: Theo Ribeiro França
+site_url: https://theoribeirofranca.github.io/redes_neurais_deep_learning_Theo
+repo_url: https://github.com/TheoRibeiroFranca/redes_neurais_deep_learning_Theo
+repo_name: TheoRibeiroFranca/redes_neurais_deep_learning_Theo
 
 theme:
   name: material
+  language: pt-BR
   palette:
-    # primary: grey
-    # Light mode
-    - scheme: default
-      primary: grey
-      toggle:
-        icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
-
-    # Palette toggle for automatic mode
-    - media: "(prefers-color-scheme)"
-      primary: grey
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to light mode
-
-    # Palette toggle for light mode
+    # Modo claro
     - media: "(prefers-color-scheme: light)"
-      scheme: default 
+      scheme: default
       primary: grey
       toggle:
         icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
+        name: Mudar para o modo escuro
 
-    # Palette toggle for dark mode
+    # Modo escuro
     - media: "(prefers-color-scheme: dark)"
-      primary: grey
       scheme: slate
+      primary: grey
       toggle:
         icon: material/toggle-switch
-        name: Switch to system preference
+        name: Mudar para a preferência do sistema
   features:
     - content.code.copy
     - content.code.select
@@ -48,8 +39,8 @@ theme:
     - navigation.path
     - navigation.tracking
     - navigation.expand
+    - navigation.indexes
   icon:
-    # logo: assets/images/devops
     admonition:
       note: fontawesome/solid/note-sticky
       abstract: fontawesome/solid/book
@@ -68,7 +59,8 @@ markdown_extensions:
   - admonition
   - attr_list
   - md_in_html
-  - markdown_grid_tables
+  - footnotes
+  - tables
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.details
@@ -77,75 +69,99 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji 
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.inlinehilite
+  # Inclusão de arquivos (--8<--): use para trazer os scripts de code/ para o relatório
   - pymdownx.snippets:
+      base_path: [.]
+      check_paths: true
       url_download: true
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-        - name: python
-          class: python
-          validator: !!python/name:markdown_exec.validator
-          format: !!python/name:markdown_exec.formatter
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.tasklist:
-      custom_checkbox: true  
-  - footnotes
+      custom_checkbox: true
   - pymdownx.critic
   - pymdownx.caret
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
   - pymdownx.blocks.caption
-  - tables
-      
+
 plugins:
+  - search:
+      lang: pt
+  # Lightbox nas figuras dos relatórios
   - glightbox
+  # A data da última alteração é a evidência do prazo de entrega
   - git-revision-date-localized:
       enable_creation_date: true
   - git-authors
-  - git-committers:
-      repository: hsandmann/documentation.template
-      branch: main
-  - search
-  - badges
   - minify:
       minify_html: true
-  - markdown-exec
-  - render_swagger:
-      allow_arbitrary_locations : true
-  - termynal:
-      prompt_literal_start:
-        - "$"
-        - ">"
-
-# mkdocs-jupyter
+  # Renderiza notebooks .ipynb colocados diretamente na nav
   - mkdocs-jupyter:
       execute: false
       allow_errors: false
+      include_source: true
+      # Sem isto, os .py de code/ virariam páginas do site
+      include: ["*.ipynb"]
+
+# Além dos links, valida as âncoras (#secao) — com --strict, âncora quebrada vira erro.
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+# Os scripts de code/ ficam no repositório e são incluídos nos relatórios via --8<--,
+# mas não são páginas da navegação.
+not_in_nav: |
+  /exercises/*/code/*
+  /projects/*/code/*
 
 extra_javascript:
-  - https://unpkg.com/mathjax/es5/tex-mml-chtml.js
-  # - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  - https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js
-  - https://fastly.jsdelivr.net/npm/echarts/dist/echarts.min.js
-
-  # Para a implementação do mkdocs-jupyter
+  # A configuração precisa vir ANTES da biblioteca do MathJax
   - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
+# =============================================================================
+#  NAVEGAÇÃO — uma entrega, um item de menu.
+#
+#  Cada item aceita três formas (veja "Exemplos de uso" para os três em ação):
+#    1. Markdown ...: exercises/data/index.md
+#    2. Notebook  ...: exercises/data/index.ipynb
+#    3. Colab     ...: https://colab.research.google.com/drive/<ID>
+# =============================================================================
 nav:
   - Home: index.md
-  - This documentation: ./thisdocumentation/index.md
-  - Roteiros:
-    - Roteiro 1: ./roteiro1/index.md
-    - Roteiro 2: ./roteiro2/index.md
-    - Roteiro 3: ./roteiro3/index.md
-    - Roteiro 4: ./roteiro4/index.md
-    - Notebook 1: ./notebook1/ex1_data.ipynb
-  - Projeto: ./projeto/index.md
+  - Como usar este template: template/index.md
+
+  # A lista de entregas muda de edição para edição: acrescente ou remova itens
+  # aqui e as pastas correspondentes em docs/.
+  - Data: exercises/data/index.md
+  - Perceptron: exercises/perceptron/index.md
+  - MLP: exercises/mlp/index.md
+  - VAE: exercises/vae/index.md
+
+  # O projeto é UM só, com três entregas ao longo do semestre.
+  - Projeto:
+    - projects/index.md
+    - 1. EDA: projects/eda/index.md
+    # Escolha UMA das duas linhas abaixo, e apague a outra (e a pasta que sobrar):
+    - 2. Classificação: projects/classification/index.md
+    - 2. Regressão: projects/regression/index.md
+    - 3. Generativo: projects/generative/index.md
+
+  # Remova esta seção inteira quando não precisar mais dos exemplos.
+  - Exemplos de uso:
+    - Como montar o menu: examples/index.md
+    - Notebook no menu: examples/notebook/data-exercise-1.ipynb
+    - Abrir no Colab ↗: https://colab.research.google.com/github/TheoRibeiroFranca/redes_neurais_deep_learning_Theo/blob/main/docs/examples/notebook/data-exercise-1.ipynb
+
+  - Enunciados da disciplina ↗: https://insper.github.io/ann-dl/

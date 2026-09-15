@@ -1,100 +1,87 @@
-# Template de Entrega
-
+# Redes Neurais Artificiais & Deep Learning
 
 ???+ info inline end "Edição"
 
-    2025.1
+    **2026.2**
 
+    [Enunciados :material-open-in-new:](https://insper.github.io/ann-dl/){:target='_blank'}
 
-## Grupo/Kit X
+Este site é o **portfólio** das entregas da disciplina. Ele cresce ao longo do semestre:
+cada exercício e cada projeto vira um item de menu, e o repositório que o gera é parte
+da avaliação — o professor lê o site publicado **e** o repositório (Markdown, código e
+histórico do Git).
 
-1. João da Silva
-1. Pedro de Souza
-1. Maria Oliveira
-1. Grupo K
-    - João da Silva
-    - Pedro de Souza
+## Identificação
 
+Quem responde por este repositório. Os **exercícios são individuais**; a equipe do projeto
+— que pode ser diferente — fica registrada na [página do projeto](projects/index.md).
 
+| Nome completo | E-mail | GitHub |
+|---------------|--------|--------|
+| Theo Ribeiro França | theoptbr@gmail.com | [@TheoRibeiroFranca](https://github.com/TheoRibeiroFranca){:target='_blank'} |
 
-!!! tip "Instruções"
+!!! tip "Como usar este template"
 
-    Vocês devem utilizar este template como um bloco de notas para registrar o que foi feito e o que falta fazer. Vocês devem adicionar as informações necessárias.
-    O template deve ser editado e atualizado a cada entrega, registrando assim a data de entrega e o que foi feito até o momento via Git.
+    Este é um **bloco de notas versionado**: registre o que foi feito, o que falta e as
+    decisões tomadas, commitando a cada avanço. O prazo de uma entrega é o *timestamp do
+    último commit que toca a pasta daquela entrega* — não a hora do formulário nem a da
+    publicação no Pages.
 
-## Entregas
+    Comece por [Como usar este template](template/index.md).
 
-- [x] Roteiro 1 - Data 23/02/2025
-- [ ] Roteiro 2
-- [ ] Roteiro 3
-- [ ] Roteiro 4
-- [ ] Projeto
+## Status das entregas
 
-## Diagramas
+Calendário, pesos e regras da edição **2026.2** — a fonte é o
+[overview](https://insper.github.io/ann-dl/2026.2/){:target='_blank'}; se algo divergir, vale o overview.
 
-Use o [Mermaid](https://mermaid.js.org/intro/){:target='_blank'} para criar os diagramas de documentação.
+### Exercícios — individuais · 40% da nota individual
 
-[Mermaid Live Editor](https://mermaid.live/){:target='_blank'}
+Cada exercício vale 25% deste bloco.
 
+- [ ] [Data](exercises/data/index.md) — 10.set · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/exercises/data/){:target='_blank'}
+- [ ] [Perceptron](exercises/perceptron/index.md) — 22.set · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/exercises/perceptron/){:target='_blank'}
+- [ ] [MLP](exercises/mlp/index.md) — 13.out · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/exercises/mlp/){:target='_blank'}
+- [ ] [VAE](exercises/vae/index.md) — 22.out · enunciado ainda não publicado
 
-``` mermaid
-flowchart TD
-    Deployment:::orange -->|defines| ReplicaSet
-    ReplicaSet -->|manages| pod((Pod))
-    pod:::red -->|runs| Container
-    Deployment -->|scales| pod
-    Deployment -->|updates| pod
+Os outros 60% da nota individual vêm da **prova final**, em 24.nov.
 
-    Service:::orange -->|exposes| pod
+### [Projeto](projects/index.md) — em equipe
 
-    subgraph  
-        ConfigMap:::orange
-        Secret:::orange
-    end
+Um projeto, um dataset, três entregas:
 
-    ConfigMap --> Deployment
-    Secret --> Deployment
-    classDef red fill:#f55
-    classDef orange fill:#ffa500
-```
+- [ ] [EDA](projects/eda/index.md) — 08.out · 20% · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/eda/){:target='_blank'}
+- [ ] [Classificação](projects/classification/index.md) **ou** [Regressão](projects/regression/index.md) — 05.nov · 60% · enunciados: [classificação :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/classification/){:target='_blank'} · [regressão :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/regression/){:target='_blank'}
+- [ ] [Generativo](projects/generative/index.md) — 20.nov · 20% · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/generative/){:target='_blank'}
 
+!!! warning "As duas notas precisam de 5"
 
+    A nota final é a média entre individual e equipe **só se ambas alcançarem 5**; caso
+    contrário, é o **mínimo** das duas. E a nota de equipe é o mínimo entre o projeto e a
+    **prova de projeto** (19.nov) — a prova não soma, ela limita.
 
-## Códigos
+    Toda nota está sujeita a **defesa oral**: resultado negativo na defesa zera a nota
+    correspondente.
 
-=== "De um arquivo remoto"
+## Checklist antes de cada entrega
 
-    ``` { .yaml .copy .select linenums='1' title="main.yaml" }
-    --8<-- "https://raw.githubusercontent.com/hsandmann/documentation.template/refs/heads/main/.github/workflows/main.yaml"
-    ```
+- [ ] Repositório **público** e o GitHub Pages construindo sem erro.
+- [ ] Caminho correto: `docs/exercises/<slug>/index.md` (ou `docs/projects/<slug>/index.md`).
+- [ ] *Front matter* com `exercise:` (ou `project:`) e `ai_use:` preenchidos.
+- [ ] Títulos espelhando a estrutura do enunciado (`## Exercise N`, `### A`, `### B`, ...).
+- [ ] Figuras commitadas em `figures/`, numeradas e exibidas no relatório.
+- [ ] Scripts como arquivos reais em `code/`, referenciados via `--8<--`.
+- [ ] Tabela **Results summary** completa, sem linhas em branco.
+- [ ] Último commit anterior ao prazo.
 
-=== "Anotações no código"
+!!! danger "Escreva para defender"
 
-    ``` { .yaml title="compose.yaml" }
-    name: app
+    As notas da disciplina costumam estar sujeitas a defesa oral, e a nota do projeto, a uma
+    prova sobre o próprio projeto. Escreva relatórios que você consiga sustentar meses
+    depois — o que inclui entender cada linha do código que está no repositório. Confira as
+    regras da sua edição no overview.
 
-        db:
-            image: postgres:17
-            environment:
-                POSTGRES_DB: ${POSTGRES_DB:-projeto} # (1)!
-                POSTGRES_USER: ${POSTGRES_USER:-projeto}
-                POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-projeto}
-            ports:
-                - 5432:5432 #(2)!
-    ```
+!!! danger "Uso de IA"
 
-    1.  Caso a variável de ambiente `POSTGRES_DB` não exista ou seja nula - não seja definida no arquivo `.env` - o valor padrão será `projeto`. Vide [documentação](https://docs.docker.com/reference/compose-file/interpolation/){target='_blank'}.
-
-    2. Aqui é feito um túnel da porta 5432 do container do banco de dados para a porta 5432 do host (no caso localhost). Em um ambiente de produção, essa porta não deve ser exposta, pois ninguém de fora do compose deveria acessar o banco de dados diretamente.
-
-
-## Exemplo de vídeo
-
-Lorem ipsum dolor sit amet
-
-<iframe width="100%" height="470" src="https://www.youtube.com/embed/3574AYQml8w" allowfullscreen></iframe>
-
-
-## Referências
-
-[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/reference/){:target='_blank'}
+    O campo `ai_use` é **obrigatório** em toda entrega. Colaborar com IA é permitido;
+    não declarar o uso, não. Descreva o que foi gerado, revisado ou depurado com apoio de
+    IA — ou escreva `"none"`.
