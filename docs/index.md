@@ -18,7 +18,7 @@ Quem responde por este repositório. Os **exercícios são individuais**; a equi
 
 | Nome completo | E-mail | GitHub |
 |---------------|--------|--------|
-| Theo Ribeiro França | theoptbr@gmail.com | [@TheoRibeiroFranca](https://github.com/TheoRibeiroFranca){:target='_blank'} |
+| Theo Ribeiro França | theorf@al.insper.edu.br | [@TheoRibeiroFranca](https://github.com/TheoRibeiroFranca){:target='_blank'} |
 
 !!! tip "Como usar este template"
 
