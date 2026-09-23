@@ -38,7 +38,7 @@ Calendário, pesos e regras da edição **2026.2** — a fonte é o
 
 Cada exercício vale 25% deste bloco.
 
-- [ ] [Data](exercises/data/index.md) — 10.set · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/exercises/data/){:target='_blank'}
+- [x] [Data](exercises/data/index.md) — 10.set · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/exercises/data/){:target='_blank'}
 - [ ] [Perceptron](exercises/perceptron/index.md) — 22.set · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/exercises/perceptron/){:target='_blank'}
 - [ ] [MLP](exercises/mlp/index.md) — 13.out · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/exercises/mlp/){:target='_blank'}
 - [ ] [VAE](exercises/vae/index.md) — 22.out · enunciado ainda não publicado
