@@ -1,6 +1,6 @@
 ---
 exercise: perceptron
-ai_use: "none"
+ai_use: "usado como auxiliar para corrigirbugs no código e prencher esse md com as informações adquiridas"
 ---
 
 # 2. Perceptron
