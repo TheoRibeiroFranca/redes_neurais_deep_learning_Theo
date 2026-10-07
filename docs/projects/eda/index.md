@@ -13,7 +13,7 @@ ai_use: "none"
 
     | Nome completo | GitHub |
     |---------------|--------|
-    | | |
+    |Theo França |TheoRibeiroFranca |
     | | |
     | | |
 
@@ -33,18 +33,50 @@ ai_use: "none"
 
 ## 1. Dataset
 
-Nome, fonte, licença, dimensões e **por que** este dataset. Se houve troca em relação a uma
-ideia anterior, diga qual e por quê.
+| | |
+|---|---|
+| **Nome** | Bitcoin Historical Data (`btcusd_1-min_data.csv`) |
+| **Fonte** | [Kaggle — mczielinski/bitcoin-historical-data](https://www.kaggle.com/datasets/mczielinski/bitcoin-historical-data){:target='_blank'}, dados da exchange **Bitstamp** |
+| **Licença** | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/){:target='_blank'} |
+| **Versão** | 745 (393,95 MB) |
+| **Período** | 2012-01-01 00:01 → 2026-10-06 03:43 (UTC) |
+| **Dimensões** | 7 764 703 linhas × 6 colunas |
+| **Tarefa** | Regressão — prever o preço de fechamento (`Close`) |
+
+**O que é cada linha:** uma janela de **1 minuto** de negociação do par BTC/USD na Bitstamp,
+no formato OHLCV (*Open, High, Low, Close, Volume*). A série é contínua: a diferença entre
+timestamps consecutivos é sempre de 60 s, sem buracos nem timestamps repetidos — minutos sem
+negócio aparecem com `Volume = 0` e o preço repetido do minuto anterior (16,9% das linhas).
+
+**Por que este dataset:** é uma série temporal longa (quase 15 anos), limpa e de domínio
+público, com milhões de amostras — volume suficiente para treinar uma rede neural — e um alvo
+contínuo natural para regressão. Também cobre regimes muito diferentes de preço (de US$ 3,80
+a US$ 126 mil), o que torna o pré-processamento (escala, retornos, split temporal) uma parte
+real do problema.
 
 ## 2. Estrutura e tipos
 
-Quantas amostras, quantas features, e o tipo de cada uma (numérica contínua, discreta,
-categórica nominal, ordinal, data, texto). Aponte as que estão com o tipo errado no arquivo
-bruto — um CEP lido como inteiro é numérico para o pandas e categórico para o modelo.
+7 764 703 amostras, 1 coluna de tempo, 4 features numéricas e 1 alvo. No arquivo bruto, o
+pandas lê `Timestamp` como `int64` e o resto como `float64`; o `Timestamp` está com o tipo
+errado — é um instante em *Unix time* (segundos desde 1970-01-01 UTC), não uma quantidade —
+e é convertido com `pd.to_datetime(..., unit="s")` e usado como índice da série.
 
-| Feature | Tipo | Cardinalidade / faixa | Observação |
-|---------|------|-----------------------|------------|
-| | | | |
+| Feature | Tipo | Unidade | Significado | Cardinalidade / faixa | Observação |
+|---------|------|---------|-------------|-----------------------|------------|
+| `Timestamp` | data/hora (lida como `int64`) | s (Unix, UTC) | Início da janela de 60 s | 7 764 703 valores únicos; 2012-01-01 → 2026-10-06 | Identificador da linha → vira índice, não feature |
+| `Open` | numérica contínua | USD | Preço da primeira negociação da janela | 3,80 – 126 202 | — |
+| `High` | numérica contínua | USD | Maior preço negociado na janela | 3,80 – 126 272 | — |
+| `Low` | numérica contínua | USD | Menor preço negociado na janela | 3,80 – 126 158 | — |
+| `Close` | numérica contínua | USD | Preço da última negociação da janela | 3,80 – 126 202 | **Alvo** |
+| `Volume` | numérica contínua | BTC | Quantidade de bitcoin negociada na janela | 0 – 5 853,85 | 16,9% de zeros (minutos sem negócio) |
+
+Nenhuma coluna tem valores ausentes e não há linhas duplicadas (detalhes na seção 6).
+
+!!! warning "Atenção para a parte B"
+
+    `Open`, `High` e `Low` são do **mesmo minuto** que o `Close`: usá-los para prever o
+    `Close` daquele minuto é vazamento (`Low ≤ Close ≤ High` por construção). O alvo terá de
+    ser o `Close` de um instante **futuro**, usando só informação passada.
 
 ## 3. Variável alvo
 
