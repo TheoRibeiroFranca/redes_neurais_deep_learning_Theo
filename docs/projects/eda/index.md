@@ -80,21 +80,28 @@ Nenhuma coluna tem valores ausentes e não há linhas duplicadas (detalhes na se
 
 ## 3. Variável alvo
 
-Distribuição do alvo e o que ela implica.
+O alvo é o preço de fechamento `Close` (regressão).
 
-- **Classificação:** proporção por classe, razão entre a maior e a menor.
-- **Regressão:** distribuição, assimetria, cauda, presença de zeros ou censura.
+| Série | Média | Desvio | Mín | Q1 | Mediana | Q3 | Máx | Assimetria |
+|-------|-------|--------|-----|----|---------|----|-----|------------|
+| `Close` (USD) | 24 335 | 31 708 | 3,80 | 470,40 | 8 255 | 40 903 | 126 202 | 1,32 |
 
-![Distribuição da variável alvo](figures/fig01-exemplo.svg)
+![Distribuição do Close e do log(Close)](figures/close_hist.png)
 /// caption
-**Figura 1** — Distribuição da variável alvo.
+**Figura 1** — Histograma do `Close` em USD (esq.) e de `log(Close)` (dir.).
 ///
+
+- **Preço bruto:** assimetria positiva forte (1,32), com média três vezes maior que a mediana.
+  Um terço dos minutos tem preço abaixo de US$ 1 000, porque o bitcoin passou anos barato.
+  Por isso aparece o pico perto de zero na Figura 1. A distribuição não tem "forma": é o
+  histórico de quanto tempo o preço passou em cada patamar.
+- **log(Close):** comprime as 4,5 ordens de grandeza (US$ 3,80 → US$ 126 mil) e remove a
+  assimetria positiva, mas continua com vários picos, um por regime de mercado.
+- Não há zeros nem censura: o preço não tem teto nem piso artificiais.
 
 !!! question "Responda"
 
-    O quão desbalanceado está? Um classificador que sempre responde a classe majoritária
-    acerta quantos por cento? Esse número é o seu *baseline* — as entregas seguintes precisam
-    superá-lo.
+    Não há classes, então não há desbalanceamento.
 
 ## 4. Análise univariada
 
@@ -116,15 +123,35 @@ Relação entre as features e o alvo, e entre as features.
 
 | Feature | % ausente | Padrão (aleatório?) | Tratamento planejado |
 |---------|-----------|---------------------|----------------------|
-| | | | |
+| todas | 0% | — | nenhum |
 
-Ausência raramente é aleatória. Se falta mais em um grupo do que em outro, o próprio "estar
-ausente" carrega informação.
+Nenhuma célula é `NaN`. A ausência existe, mas aparece de outra forma: um minuto sem
+negócio vem com `Volume = 0` e com `Open = High = Low = Close` igual ao último preço
+(1 312 416 linhas, 16,9%, e em **todas** elas os quatro preços são iguais). Ou seja, o
+preço desses minutos é preenchido, não observado.
 
 ### Duplicatas e inconsistências
 
-Linhas repetidas, categorias escritas de formas diferentes, unidades misturadas, datas
-impossíveis.
+| Verificação | Linhas |
+|-------------|--------|
+| Linhas duplicadas (incluindo o `Timestamp`) | 0 |
+| Timestamps repetidos | 0 |
+| Intervalo entre linhas ≠ 60 s (buracos na série) | 0 |
+| Preço ≤ 0 | 0 |
+| `Volume` < 0 | 0 |
+| `High` < `Low` | 0 |
+| `Open` fora de [`Low`, `High`] | 0 |
+| `Close` fora de [`Low`, `High`] | 0 |
+
+O arquivo é internamente consistente: todas as regras de um candle OHLC valem em todas as
+linhas.
+
+**Colunas a remover:**
+
+- `Timestamp`: identificador da linha. Vira índice da série, não feature.
+- **Constantes:** nenhuma (todas as colunas têm mais de um valor único).
+- **Vazam o alvo:** `Open`, `High` e `Low` do **mesmo minuto** do `Close` (correlação de
+  Pearson = 1,000000 com o alvo) — ver seção 7.
 
 ### Outliers
 
@@ -146,8 +173,10 @@ flowchart LR
 
 | Risco | Onde aparece | Contenção |
 |-------|--------------|-----------|
-| Estatísticas calculadas antes do split | | Ajustar transformadores só no treino |
-| | | |
+| Estatísticas calculadas antes do split | Média/desvio do `StandardScaler` | Ajustar transformadores só no treino |
+| OHLC do mesmo minuto do alvo | `Open`, `High`, `Low` no minuto *t* para prever `Close[t]` (`Low ≤ Close ≤ High` por construção; correlação = 1,0) | Alvo é o `Close` de um instante **futuro**; features só com informação até *t* |
+| Split aleatório numa série temporal | Minutos vizinhos (quase idênticos) em treino e teste | Split **temporal** (seção 9) |
+| Janelas que atravessam o corte | Features com *lags*/médias móveis no início do teste usando dados do treino, ou alvo do fim do treino olhando para o teste | Gerar janelas depois do split, ou descartar as linhas na borda |
 
 ## 8. Plano de pré-processamento
 
@@ -159,22 +188,47 @@ A saída desta entrega. Uma linha por transformação, ligando cada uma a um ach
 
 ## 9. Estratégia de split
 
-Proporções, estratificação, e o que impede uma mesma entidade de cair nos dois lados
-(agrupamento por usuário, por data, por sessão).
+Split **temporal** com corte fixo em **2024-01-01**: tudo antes vai para o treino, tudo
+depois para o teste. Não há aleatoriedade, então a semente (`SEED = 42`) não muda o resultado,
+e não há estratificação porque o alvo é contínuo. O corte no tempo é o que impede o modelo
+de "ver o futuro". Num split aleatório, o minuto *t* ficaria no teste e o *t−1*, quase
+idêntico, no treino.
+
+| Conjunto | Linhas | % | Período | `Close` mín – máx (USD) | `Close` médio (USD) |
+|----------|--------|---|---------|-------------------------|---------------------|
+| Treino | 6 311 519 | 81,3% | 2012-01-01 00:01 → 2023-12-31 23:59 | 3,80 – 69 000 | 11 319 |
+| Teste | 1 453 184 | 18,7% | 2024-01-01 00:00 → 2026-10-06 03:43 | 38 508 – 126 202 | 80 868 |
+
+![Close diário com o corte do split](figures/close_split.png)
+/// caption
+**Figura 2** — `Close` diário (último minuto de cada dia), com o treino em azul e o teste em
+laranja. A troca de cor marca o corte de 2024-01-01.
+///
+
+!!! danger "O teste está fora da faixa do treino"
+
+    **61,4%** dos minutos do teste têm `Close` acima do máximo do treino (US$ 69 000): o
+    modelo seria avaliado num território que nunca viu. Isso pesa contra usar o preço bruto
+    como alvo ou como entrada. Retornos ou preço normalizado por janela não sofrem com isso.
+
+**A partir daqui, toda estatística de pré-processamento (média, desvio)
+é calculada só no conjunto de treino** e aplicada ao teste com `transform`.
+Se for preciso um conjunto de validação, ele sai do fim do treino, também por corte
+temporal.
 
 ## Results summary
 
 | # | Métrica | Valor |
 |---|---------|-------|
-| 1 | Amostras | |
+| 1 | Amostras | 7 764 703 |
 | 2 | Features (antes / depois do encoding) | |
-| 3 | Features com ausentes | |
-| 4 | Maior % de ausência em uma feature | |
-| 5 | Linhas duplicadas | |
-| 6 | Razão de desbalanceamento do alvo | |
+| 3 | Features com ausentes | 0 (`NaN`); 16,9% dos minutos sem negócio |
+| 4 | Maior % de ausência em uma feature | 0% |
+| 5 | Linhas duplicadas | 0 |
+| 6 | Razão de desbalanceamento do alvo | não se aplica (regressão) |
 | 7 | Acurácia (ou erro) do baseline trivial | |
-| 8 | Maior correlação feature–alvo | |
-| 9 | Amostras treino / teste após o split | |
+| 8 | Maior correlação feature–alvo | 1,000 (`Open`/`High`/`Low` do mesmo minuto — vazamento) |
+| 9 | Amostras treino / teste após o split | 6 311 519 / 1 453 184 |
 
 ## Conclusão
 
