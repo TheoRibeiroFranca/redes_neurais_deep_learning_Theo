@@ -28,8 +28,12 @@ def describe(df: pd.DataFrame):
     print(close_decribe)
     print(close_assimetria)
 
-    df[TARGET].plot.hist(bins=100, title="Histograma de Close")
-    plt.xlabel("Preço de fechamento (USD)")
+    # Figura 1: Close e log(Close) lado a lado
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+    ax1.hist(df[TARGET], bins=100)
+    ax1.set_title("Close (USD)")
+    ax2.hist(np.log(df[TARGET]), bins=100)
+    ax2.set_title("log(Close)")
     plt.savefig(FIGURES / "close_hist.png", dpi=120, bbox_inches="tight")
     plt.close()
 
@@ -59,10 +63,26 @@ def describe(df: pd.DataFrame):
     for gap, count in gaps.items():
         print(f"    {gap} → {count}")
     print(f"  timestamps repetidos: {df.index.duplicated().sum()}")
-    
+
     print(f"  linhas duplicadas   : {df.reset_index().duplicated().sum()}")
 
 
+def quality(df: pd.DataFrame):
+    print("\nRegras do candle (linhas que violam)")
+    print("preço <= 0:", (df[["Open", "High", "Low", "Close"]] <= 0).any(axis=1).sum())
+    print("Volume < 0:", (df["Volume"] < 0).sum())
+    print("High < Low:", (df["High"] < df["Low"]).sum())
+    print("Open fora:", ((df["Open"] < df["Low"]) | (df["Open"] > df["High"])).sum())
+    print("Close fora:", ((df["Close"] < df["Low"]) | (df["Close"] > df["High"])).sum())
+
+    print("\nMinutos sem negócio")
+    sem_negocio = df["Volume"] == 0
+    precos_iguais = (df["Open"] == df["Close"]) & (df["High"] == df["Close"]) & (df["Low"] == df["Close"])
+    print("sem negócio:", sem_negocio.sum())
+    print("sem negócio e preços iguais:", (sem_negocio & precos_iguais).sum())
+
+    print("\nCorrelação com Close")
+    print(df.corr()[TARGET])
 
 
 def main():
@@ -74,7 +94,28 @@ def main():
     describe(df)
 
     print(f"\nTipos de feature\n  numéricas  : {COLUMNS}")
-    
+
+    quality(df)
+
+    cut = '2024-01-01'
+    train, test = df[df.index < cut], df[df.index >= cut]
+
+    print("\nSplit temporal")
+    for nome, parte in [("treino", train), ("teste", test)]:
+        print(nome, len(parte), len(parte) / len(df) * 100, parte.index.min(), parte.index.max())
+        print("  Close mín/máx/média:", parte[TARGET].min(), parte[TARGET].max(), parte[TARGET].mean())
+    print("% teste acima do máx do treino:", (test[TARGET] > train[TARGET].max()).mean() * 100)
+
+    # Figura 2: Close diário, treino e teste em cores diferentes
+    plt.figure(figsize=(11, 4))
+    plt.plot(train[TARGET].resample("D").last(), label="treino")
+    plt.plot(test[TARGET].resample("D").last(), label="teste")
+    plt.title("Close diário e o corte do split")
+    plt.ylabel("USD")
+    plt.legend()
+    plt.savefig(FIGURES / "close_split.png", dpi=120, bbox_inches="tight")
+    plt.close()
+
 
 
 if __name__ == "__main__":
