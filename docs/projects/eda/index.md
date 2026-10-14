@@ -495,13 +495,37 @@ Features de saída: `preco__ret_1`, `preco__amplitude`, `preco__direcao`, `volum
 | 4 | Maior % de ausência em uma feature | 0% |
 | 5 | Linhas duplicadas | 0 |
 | 6 | Razão de desbalanceamento do alvo | não se aplica (regressão) |
-| 7 | Acurácia (ou erro) do baseline trivial | |
-| 8 | Maior correlação feature–alvo | 1,000 (`Open`/`High`/`Low` do mesmo minuto — vazamento) |
+| 7 | Acurácia (ou erro) do baseline trivial | Prever retorno zero no teste: RMSE = 0,000665 e MAE = 0,000407 (≈ 0,04% por minuto) |
+| 8 | Maior correlação feature–alvo | 1,000 com o `Close` bruto (`Open`/`High`/`Low` do mesmo minuto — vazamento); após o pré-processamento, −0,11 (Spearman, `ret_1` × retorno futuro) |
 | 9 | Amostras treino / teste após o split | 6 311 519 / 1 453 184 (6 311 517 / 1 453 183 após o descarte das bordas) |
 
 ## Conclusão
 
-O que o dataset permite e o que ele impede. Se algum achado inviabiliza a tarefa pretendida,
-é aqui que a equipe muda de rumo — ainda dá tempo.
+**O que o dataset permite:** é uma série de 7,7 milhões de minutos, sem `NaN`, sem duplicatas
+e sem buracos, em que todas as regras de um candle OHLC valem (seção 6). Há volume de sobra
+para treinar uma rede neural, e o pré-processamento é curto: quatro features relativas, um
+`log1p` e uma escala ajustada no treino (seção 10).
+
+**O que ele impede:** prever o `Close` em dólares. Com os preços do mesmo minuto o problema é
+trivial por vazamento (correlação de 1,0, seção 5), e sem eles o teste fica fora da faixa do
+treino (61,4% acima do máximo, seção 9). Por isso a tarefa foi redefinida: o alvo passa a ser
+o **retorno do minuto seguinte**, e não o preço.
+
+**O que isso muda para a próxima entrega:**
+
+- **O sinal é fraco.** A maior correlação entre uma feature e o alvo é de −0,11, e nenhuma
+  projeção da seção 10 separa o alvo. As features do minuto atual dizem **quanto** o preço
+  vai oscilar, não **para onde**. Um modelo que só empatar com o baseline trivial (prever
+  retorno zero, RMSE = 0,000665) não aprendeu nada; é contra ele que o regressor será medido.
+- **Treino e teste são regimes diferentes.** No teste, os retornos oscilam cerca de 3× menos
+  e só 6,0% dos minutos têm retorno zero, contra 28,9% no treino, onde os minutos sem negócio
+  dos primeiros anos pesam muito. O modelo vai ser avaliado num mercado mais líquido e mais
+  calmo do que o que viu. Se for preciso, a validação deve sair do fim do treino (seção 9),
+  que é o trecho mais parecido com o teste.
+- **Próximos passos possíveis**, se o sinal de 1 minuto se mostrar fraco demais: horizontes
+  mais longos para o alvo (1 hora, 1 dia) e features de janela, como retorno acumulado e
+  volatilidade móvel, no espírito do *time-series momentum*.
+
+Nenhum achado inviabiliza a regressão. A equipe segue com o dataset e com o alvo em retorno.
 
 ## Referências

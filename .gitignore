@@ -5,3 +5,4 @@ env/
 target/
 # dataset do projeto (375 MB, acima do limite de 100 MB do GitHub) — baixar do Kaggle
 data/btcusd_1-min_data.csv
+__pycache__/
