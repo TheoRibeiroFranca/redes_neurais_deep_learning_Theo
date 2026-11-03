@@ -1,112 +1,179 @@
 ---
 project: regression
-ai_use: "none"
+dataset: https://www.kaggle.com/datasets/mczielinski/bitcoin-historical-data
+team:
+  - Theo Ribeiro França
+  - Lucas Sato Coelho de Oliveira
+  - Rafael Kauffmann
+ai_use: "estruturação do index.md (TODO: completar com o uso real de IA nesta entrega)"
 ---
 
 # 2. Regressão
 
 !!! abstract "Entrega 2 de 3 do [Projeto](../index.md)"
 
-    [Projects → Regression](https://insper.github.io/ann-dl/2026.2/projects/regression/){:target='_blank'} · prazo **05.nov.2026**
+    [Projects → Classification or Regression](https://insper.github.io/ann-dl/2026.2/projects/supervised/){:target='_blank'} · prazo **05.nov.2026, 23:59**
 
 !!! info "Equipe"
 
     | Nome completo | GitHub |
     |---------------|--------|
-    | | |
-    | | |
-    | | |
+    | Theo Ribeiro França | TheoRibeiroFranca |
+    | Lucas Sato Coelho de Oliveira | lucassatoco |
+    | Rafael Kauffmann | RafaelKauffmann |
 
     Dataset, decisões e status: [página do projeto](../index.md).
 
-!!! warning "Esta entrega é uma escolha"
+Rede neural treinada no mesmo dataset, com a mesma tarefa e o mesmo split do
+[EDA](../eda/index.md): prever o **retorno logarítmico do minuto seguinte** do BTC/USD
+(`ret_futuro = log(Close[t+1] / Close[t])`) a partir de `ret_1`, `amplitude`, `direcao` e
+`log1p(Volume)`. A pergunta que guia a entrega: *a rede aprende algo que modelos simples não
+aprendem? E até que ponto dá para confiar no número que ela reporta?*
 
-    A equipe entrega **classificação ou regressão**, não as duas. Se a escolha foi a outra,
-    apague esta pasta e a linha correspondente na `nav` do `mkdocs.yml`.
+## 0. Ponto de partida
 
-O dataset e as decisões da equipe ficam na [página do projeto](../index.md). As duas
-primeiras seções abaixo são exigidas pelo enunciado, mas o [EDA](../eda/index.md) já as
-respondeu em profundidade: **resuma e aponte para lá**, em vez de refazer a análise.
+O pipeline do EDA é importado de [`../eda/code/exercise4.py`](../eda/code/exercise4.py)
+(`build_features`, `split`, `make_preprocess`), sem cópia, e ajustado **só no treino**.
 
-## 1. Escolha do dataset
+| | Treino | Validação | Teste |
+|---|--------|-----------|-------|
+| Período | 2012-01-01 → TODO | TODO → 2023-12-31 | 2024-01-01 → 2026-10-06 |
+| Linhas | TODO | TODO | 1 453 183 |
 
-Nome, URL da fonte, dimensões e por que ele sustenta uma tarefa de regressão não trivial.
+A validação sai do **fim do treino, por corte temporal**, como o EDA previu
+([EDA §9](../eda/index.md#9-estrategia-de-split)). O teste é usado **uma única vez**, na
+seção 5. `SEED = 42` em tudo.
 
-## 2. Descrição do dataset
+!!! todo "Correções do EDA"
 
-Features, variável alvo, contexto do domínio e os problemas herdados do EDA que esta entrega
-precisa resolver.
+    Liste aqui o que a correção do EDA apontou e como foi resolvido (ou "nenhuma").
 
-## 3. Limpeza e normalização
+!!! todo "Métrica principal e critério de sucesso (definidos antes de treinar)"
 
-Execute o plano de pré-processamento definido no [EDA](../eda/index.md#8-plano-de-pre-processamento)
-e relate o que mudou em relação ao planejado — e por quê.
+    - **Métrica principal:** TODO (ex.: MAE na escala original do retorno).
+    - **Critério de sucesso:** TODO (ex.: "MAE pelo menos X% menor que o do melhor baseline").
 
-!!! note "Escala do alvo"
+## 1. Baselines
 
-    Se o alvo foi transformado (log, Box-Cox, padronização), a inversão precisa ser aplicada
-    antes de calcular as métricas da seção 8 — senão os números não são interpretáveis no
-    domínio.
+Avaliados na **validação**, com o mesmo pipeline.
 
-## 4. Implementação da MLP
+| Modelo | MAE | RMSE | $R^2$ |
+|--------|-----|------|-------|
+| `DummyRegressor(strategy="mean")` | | | |
+| `Ridge` | | | |
 
-Arquitetura, funções de ativação, função de perda e otimizador, **com a justificativa de cada
-escolha**. Uma tabela de hiperparâmetros não explica nada sozinha.
+!!! todo "Leitura"
+
+    O que os baselines dizem sobre o sinal disponível nas quatro features.
+
+## 2. A rede
+
+MLP em PyTorch, com código em `code/`. Saída: **1 unidade linear**.
 
 ``` mermaid
 flowchart LR
-    x["Entrada<br/>(n features)"] --> h1["Oculta 1<br/>ReLU"]
-    h1 --> h2["Oculta 2<br/>ReLU"]
-    h2 --> out["Saída"]
+    x["Entrada<br/>(4 features)"] --> h1["Oculta 1"]
+    h1 --> h2["Oculta 2"]
+    h2 --> out["Saída<br/>(1, linear)"]
 ```
 
 | | Escolha | Por quê |
 |---|---------|---------|
-| Camadas ocultas | | |
+| Camadas × unidades | | |
 | Ativação | | |
-| Função de perda | | |
+| Inicialização | | |
+| Saída | 1 unidade linear | alvo contínuo, sem limite de faixa |
+| Perda | | justificar pela cauda pesada do alvo ([EDA §6](../eda/index.md#6-qualidade-dos-dados)) |
+| Nº de parâmetros vs. linhas de treino | | |
+
+## 3. Treinamento
+
+| | Escolha | Por quê |
+|---|---------|---------|
 | Otimizador | | |
 | Learning rate | | |
 | Batch size | | |
+| Épocas (máx.) / paciência | | |
 
-## 5. Treinamento
+Early stopping na validação, restaurando os melhores pesos.
 
-O loop de treino e as dificuldades enfrentadas: instabilidade, perda que não desce,
-saturação da ativação, tempo de época. Diga o que você tentou e o que resolveu.
+!!! todo "Figura: curvas de treino e validação por época"
 
-## 6. Estratégia de treino e teste
+    Ler a curva: converge? Em que época começa o *overfitting*?
 
-Proporções do split, esquema de validação e como o *overfitting* foi contido (early stopping,
-regularização, dropout). O split precisa ser o mesmo definido no EDA — se mudou, justifique.
+## 4. Regularização e hiperparâmetros
 
-## 7. Curvas de erro
+### A. Técnicas de regularização
 
-![Curvas de perda de treino e validação por época](figures/fig01-exemplo.svg)
-/// caption
-**Figura 1** — Perda de treino e de validação por época.
-///
+| Configuração | Val. MAE | Val. RMSE | Época de parada |
+|--------------|----------|-----------|-----------------|
+| Sem regularização | | | |
+| Técnica 1 (TODO) | | | |
+| Técnica 2 (TODO) | | | |
 
-Leia a curva no texto: em que época a validação para de melhorar, e o que a distância entre
-as duas curvas diz sobre a capacidade do modelo.
+### B. Busca de hiperparâmetros
 
-## 8. Métricas de avaliação
+Pelo menos 8 configurações, escolhidas pela validação, em ordem crescente da métrica principal.
 
-| Métrica | Treino | Validação | Teste |
-|---------|--------|-----------|-------|
-| MAE | | | |
-| RMSE | | | |
-| MAPE | | | |
-| $R^2$ | | | |
+| # | lr | Camadas × unidades | Regularização | Val. métrica principal |
+|---|----|--------------------|---------------|------------------------|
+| 1 | | | | |
 
-Inclua o gráfico de resíduos ($y - \hat{y}$ contra $\hat{y}$). Resíduo com estrutura visível
-indica que o modelo deixou sinal na mesa; resíduo que abre em leque indica variância
-dependente da escala — e talvez a necessidade de transformar o alvo.
+## 5. Avaliação no teste
 
-Compare com o **baseline trivial** do EDA. Um modelo que não supera o baseline é um resultado
-— relate-o como tal, não o esconda.
+Configuração escolhida retreinada e avaliada **uma vez** no teste, com 3 seeds (média ± desvio).
 
-## Conclusão
+| Modelo | MAE | RMSE | $R^2$ |
+|--------|-----|------|-------|
+| `DummyRegressor` | | | |
+| `Ridge` | | | |
+| MLP (3 seeds) | | | |
 
-Principais achados, limitações e o que a equipe faria com mais tempo.
+MAPE não é usado: o alvo fica perto de zero.
+
+!!! todo "Figuras: previsto × real e resíduo × previsto"
+
+!!! todo "Leitura"
+
+    O critério da seção 0 foi atingido? A diferença para o baseline é maior que a variação
+    entre seeds?
+
+## 6. Análise de erro
+
+### A. Erro por subgrupo
+
+Sem categóricas no dataset, os subgrupos vêm do tempo e das faixas do alvo (ex.: ano, hora do
+dia, minutos com `Volume = 0`, faixas de |alvo|).
+
+| Subgrupo | n | MAE | Hipótese |
+|----------|---|-----|----------|
+| | | | |
+
+### B. Piores exemplos
+
+### C. Permutation importance
+
+Comparar com o que o EDA sugeriu ([EDA §10B](../eda/index.md#b-reducao-de-dimensionalidade)).
+
+## 7. Conclusão
+
+A rede valeu a pena? Limitações, quem seria afetado por um erro e o que a equipe faria com
+mais tempo.
+
+## Results summary
+
+| # | Item | Valor |
+|---|------|-------|
+| 1 | Dataset, tarefa, alvo e métrica principal | |
+| 2 | Linhas de treino · validação · teste | |
+| 3 | Melhor baseline e sua métrica no teste | |
+| 4 | Rede escolhida: camadas × unidades, nº de parâmetros, regularização | |
+| 5 | Otimizador, learning rate, batch e época de parada | |
+| 6 | Métrica principal da rede no teste (média ± desvio, 3 seeds) | |
+| 7 | Critério de sucesso atingido? | |
+| 8 | Subgrupo com maior erro e seu valor | |
 
 ## Referências
+
+- Enunciado: [Projects → Classification or Regression](https://insper.github.io/ann-dl/2026.2/projects/supervised/){:target='_blank'}
+- Dataset: [Kaggle — mczielinski/bitcoin-historical-data](https://www.kaggle.com/datasets/mczielinski/bitcoin-historical-data){:target='_blank'}

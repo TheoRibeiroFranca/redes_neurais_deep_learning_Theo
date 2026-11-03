@@ -50,7 +50,7 @@ Os outros 60% da nota individual vêm da **prova final**, em 24.nov.
 Um projeto, um dataset, três entregas:
 
 - [ ] [EDA](projects/eda/index.md) — 08.out · 20% · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/eda/){:target='_blank'}
-- [ ] [Classificação](projects/classification/index.md) **ou** [Regressão](projects/regression/index.md) — 05.nov · 60% · enunciados: [classificação :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/classification/){:target='_blank'} · [regressão :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/regression/){:target='_blank'}
+- [ ] [Regressão](projects/regression/index.md) — 05.nov · 60% · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/supervised/){:target='_blank'}
 - [ ] [Generativo](projects/generative/index.md) — 20.nov · 20% · [enunciado :material-open-in-new:](https://insper.github.io/ann-dl/2026.2/projects/generative/){:target='_blank'}
 
 !!! warning "As duas notas precisam de 5"

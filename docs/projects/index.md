@@ -29,7 +29,7 @@ abrir uma página sozinha, sem passar por aqui.
 | # | Entrega | Página | Prazo | Peso |
 |---|---------|--------|-------|------|
 | 1 | EDA | [EDA](eda/index.md) | 08.out.2026 | 20% |
-| 2 | Classificação **ou** Regressão | [Classificação](classification/index.md) · [Regressão](regression/index.md) | 05.nov.2026 | 60% |
+| 2 | Regressão | [Regressão](regression/index.md) | 05.nov.2026 | 60% |
 | 3 | Generativo | [Generativo](generative/index.md) | 20.nov.2026 | 20% |
 
 Datas e pesos da edição 2026.2 — confira no
@@ -40,12 +40,6 @@ Datas e pesos da edição 2026.2 — confira no
     Deliverables bem escritos não sustentam uma equipe que não consegue explicar o que
     entregou. Escreva os relatórios de modo que você consiga defendê-los meses depois, e
     confira no overview da sua edição como a prova entra na nota.
-
-!!! warning "Escolha uma: classificação ou regressão"
-
-    A segunda entrega é **uma das duas**, não as duas. Este template traz as duas pastas
-    para você escolher; depois de decidir, apague a que não vai usar — da pasta `docs/projects/`
-    **e** da `nav` no `mkdocs.yml`.
 
 ## Dataset
 
@@ -72,7 +66,7 @@ Detalhes no [EDA](eda/index.md).
 ## Status
 
 - [ ] **1. EDA**
-- [ ] **2. Classificação ou Regressão**
+- [ ] **2. Regressão**
 - [ ] **3. Generativo**
 
 ## Registro de decisões
