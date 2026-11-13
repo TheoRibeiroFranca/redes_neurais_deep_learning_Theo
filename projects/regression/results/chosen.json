@@ -1,0 +1,70 @@
+{
+  "escolha": "g12",
+  "motivo": "menor val_rmse entre as 16 configurações de 4A e 4B; teste não usado",
+  "n_configs_tentadas": 16,
+  "val_busca": {
+    "rmse": 0.0005806140180576778,
+    "mae": 0.000332707968465577,
+    "r2": -0.0008896478057582868
+  },
+  "config": {
+    "name": "g12",
+    "feature_set": "F65",
+    "window": "2018",
+    "hidden": [
+      256,
+      128,
+      64
+    ],
+    "dropout": 0.2,
+    "weight_decay": 0.01,
+    "lr": 0.001,
+    "batch": 4096,
+    "max_epochs": 30,
+    "patience": 5,
+    "loss": "mse",
+    "huber_delta": 1.0,
+    "seed": 42,
+    "threads": 8,
+    "max_rows": null
+  },
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "finais": [
+    {
+      "name": "final_s42",
+      "seed": 42,
+      "val": {
+        "rmse": 0.0005806140180576778,
+        "mae": 0.000332707968465577,
+        "r2": -0.0008896478057582868
+      },
+      "best_epoch": 1
+    },
+    {
+      "name": "final_s43",
+      "seed": 43,
+      "val": {
+        "rmse": 0.0005805846892848952,
+        "mae": 0.00033212183225456464,
+        "r2": -0.0007885337343052079
+      },
+      "best_epoch": 1
+    },
+    {
+      "name": "final_s44",
+      "seed": 44,
+      "val": {
+        "rmse": 0.0005808321195618373,
+        "mae": 0.00033179939632885,
+        "r2": -0.0016417362193914542
+      },
+      "best_epoch": 1
+    }
+  ],
+  "val_rmse_media": 0.0005806769423014701,
+  "val_rmse_desvio": 1.3518517237307412e-07
+}
