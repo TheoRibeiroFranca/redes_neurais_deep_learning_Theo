@@ -380,14 +380,20 @@ entre as duas formas é de 6e-8.
 
 ### A. Erro por subgrupo
 
-Os subgrupos vêm do tempo, do volume e da volatilidade, porque o dataset não tem categóricas
-([`results/subgroups_test.csv`](results/subgroups_test.csv)). Os limites dos tercis de `rv_60`
-foram calculados no treino, por isso o teste, que é mais calmo, cai quase todo no tercil 1.
+Os subgrupos vêm do tempo, do volume, da volatilidade e de faixas do alvo, porque o dataset não
+tem categóricas ([`results/subgroups_test.csv`](results/subgroups_test.csv)). Os limites dos tercis
+de `rv_60` foram calculados no treino, por isso o teste, que é mais calmo, cai quase todo no tercil 1.
+As faixas de \|alvo\| (quintis e top 1%) usam os limites do próprio teste.
 
 | Subgrupo | n | MAE | RMSE | Hipótese |
 |----------|---|-----|------|----------|
 | `Volume = 0` no minuto t | 24 970 | 2,98e-4 | 4,90e-4 | Minuto sem negócio: o preço está preenchido e o mercado está parado |
 | Com negócio | 1 281 132 | 4,22e-4 | 6,85e-4 | |
+| \|alvo\| quintil 1 (0 a 6,55e-5) | 261 221 | 2,60e-5 | 3,29e-5 | A rede prevê quase uma constante perto de zero, então o erro acompanha o tamanho do movimento em cada faixa |
+| \|alvo\| quintil 2 (6,55e-5 a 1,85e-4) | 261 220 | 1,23e-4 | 1,28e-4 | |
+| \|alvo\| quintil 3 (1,85e-4 a 3,52e-4) | 261 220 | 2,63e-4 | 2,68e-4 | |
+| \|alvo\| quintil 4 (3,52e-4 a 6,49e-4) | 261 220 | 4,81e-4 | 4,89e-4 | |
+| \|alvo\| quintil 5 (6,49e-4 a 3,61e-2) | 261 221 | 1,20e-3 | 1,41e-3 | |
 | `rv_60` tercil 1 (≤ 7,16e-4) | 998 139 | 3,10e-4 | 4,70e-4 | O erro cresce com a volatilidade recente (resíduo em "funil", Aula 8.2) |
 | `rv_60` tercil 2 | 251 328 | 6,81e-4 | 9,45e-4 | |
 | `rv_60` tercil 3 (> 1,31e-3) | 56 635 | 1,20e-3 | **1,70e-3** | |
@@ -606,4 +612,4 @@ python plots.py           # Figuras 2 a 7
 | 5 | Otimizador, learning rate, batch e época de parada | AdamW, lr 1e-3, batch 4 096; melhor época 1, parada na 6 (paciência 5) |
 | 6 | Métrica principal da rede no teste (média ± desvio, 3 seeds) | RMSE 6,8227e-4 ± 1,3e-7 |
 | 7 | Critério de sucesso atingido? | Não. A rede ficou 0,03% acima do baseline (era preciso 0,5% abaixo), e a diferença está dentro de 2 desvios entre seeds |
-| 8 | Subgrupo com maior erro e seu valor | Minutos de maior volatilidade recente (`rv_60` no tercil 3, n = 56 635): RMSE 1,70e-3, 2,5 vezes o RMSE geral |
+| 8 | Subgrupo com maior erro e seu valor | Minutos com \|alvo\| no top 1% (n = 13 062): RMSE 3,82e-3, 5,6 vezes o RMSE geral. Entre os subgrupos que se conhecem antes do minuto, o pior é `rv_60` no tercil 3 (n = 56 635): RMSE 1,70e-3, 2,5 vezes o geral |
