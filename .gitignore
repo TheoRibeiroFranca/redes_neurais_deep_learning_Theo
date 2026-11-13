@@ -8,3 +8,7 @@ data/btcusd_1-min_data.csv
 __pycache__/
 # MNIST baixado pelo torchvision no exercício de VAE
 data/MNIST/
+
+# Entrega 2: cache das features e pesos treinados (regeneráveis pelos scripts)
+data/cache/
+docs/projects/regression/results/models/
