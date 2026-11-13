@@ -1,0 +1,18 @@
+{
+  "n_linhas": 1306102,
+  "n_y_diferente_de_zero": 1228092,
+  "n_yhat_zero": 0,
+  "acerto": 0.49889503392254003,
+  "acerto_baseline_classe_majoritaria": 0.5021903896450755,
+  "matriz": {
+    "real_sobe": {
+      "prev_sobe": 29943,
+      "prev_desce": 586793
+    },
+    "real_desce": {
+      "prev_sobe": 28610,
+      "prev_desce": 582746
+    }
+  },
+  "nota": "extra de sinal: sem backtest, custo ou P&L; yhat = 0 conta como erro no acerto"
+}
